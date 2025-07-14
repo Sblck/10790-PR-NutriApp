@@ -1,0 +1,2 @@
+Zona dos modelos ( entidades ) do Sistema.
+Representam o conjunto de entidades base do sistema, as suas relações, atributos e comportamentos/métodos.

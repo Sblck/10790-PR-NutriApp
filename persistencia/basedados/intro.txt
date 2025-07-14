@@ -1,0 +1,2 @@
+Zona de base dados.
+Tabelas, schemas, métodos gerais de criação, applicação, manipulação usando SQL.

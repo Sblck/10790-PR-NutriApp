@@ -1,0 +1,3 @@
+'''
+Entrada da app
+'''

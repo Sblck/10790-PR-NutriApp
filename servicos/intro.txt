@@ -1,0 +1,3 @@
+Zona de Serviços do Sistema.
+Responsáveis por realizar ações da aplicação completa ( ações que envonvem a coodernação de múltiplos gestores)
+Poderam utilizador os modelos, diretamente ou indiretamente por intermédio de gestores ou intânciamento (local)

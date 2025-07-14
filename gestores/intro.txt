@@ -1,0 +1,3 @@
+Zona onde se encontram os gestores do sistemas.
+Responsáveis pela lógica do domínio.
+Atuam diretamente sobre uma entidade (modelo)

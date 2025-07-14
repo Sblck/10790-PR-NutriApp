@@ -1,0 +1,4 @@
+Zona dos Repositório.
+Fazem a ligação e a comunicação entre o domínio e a base de dados (persistência).
+Recebem objetos completos e executam as acções necessárias para os converter em  estruturas de dados persistentes.
+Disponibilizam métodos de consulta.
