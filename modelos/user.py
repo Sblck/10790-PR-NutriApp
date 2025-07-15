@@ -10,3 +10,10 @@ class User:
         self.id = id
         self.email = email
         self.password = password
+
+
+    def is_valid(self):
+        '''
+        Valida se os campos obrigatórios existem
+        '''
+        return self.email is not None and self.password is not None
