@@ -173,3 +173,6 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 config.ini
+cleanup_database.py
+config.ini
+servicos/userService.py
