@@ -2,7 +2,17 @@
 Entrada da app
 '''
 import os
+from interface.cli.cli_app import CLIApp
+from interface.cli.cli_landing import CLILanding
 from persistencia.basedados.DataBase import DataBase
+from servicos.AuthService import AuthService
+from servicos.RegistrationService import RegistrationService
+from servicos.UserService import UserService
+from gestores.UserManager import UserManager
+from gestores.ProfileManager import ProfileManager
+from persistencia.repositorios.UserRepository import UserRepository
+from persistencia.repositorios.ProfileRepository import ProfileRepository
+from interface.cli.cli_main import CLIMain
 
 # NOTA : Consultar o diagrama : Processo de inicialização
 def init():
@@ -45,10 +55,43 @@ def init():
     return db  # retorna a instância para ser usada no resto da app
 
 def main():
+    # init da BD, repos, managers, services etc
     db = init()
+    
+    # utilizador
+    user_repo = UserRepository(db)
+    user_manager = UserManager(user_repo)
+    user_service = UserService(user_repo, user_manager)
 
-    # fluxo da aplicação princiapl (menus, auth, etc)
-    # ex: mostrar_menu_principal(db)
+    # perfil
+    profile_repo = ProfileRepository(db)
+    profile_manager = ProfileManager()
+
+    # operaçoes
+    auth_service = AuthService(user_manager=user_manager,user_repo=user_repo)
+    registration_service = RegistrationService(
+        user_manager=user_manager,
+        user_repo=user_repo,
+        profile_manager=profile_manager,
+        profile_repo=profile_repo
+    )
+
+    # interfaces cli
+    cli_auth = CLILanding(auth_service=auth_service,registration_service=registration_service)
+    cli_app = CLIApp(user_service)
+
+    #Main loop interface
+    cli = CLIMain(cli_auth, cli_app)
+
+    # fluxo da aplicação princiapl (auth, menus etc)
+    cli.run()
+
+    
+    
+    #cli_profile = CLIProfile(user_service, profile_service)
+
+
+
     # ...
 
 if __name__ == "__main__":

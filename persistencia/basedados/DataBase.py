@@ -1,5 +1,7 @@
 import configparser
+from typing import Mapping
 import mysql.connector
+
 
 class DataBase:
     """
@@ -17,9 +19,9 @@ class DataBase:
         self.cursor = None
 
 
-    def load_config(self, config_path):
+    def load_config(self, config_path : str) -> Mapping[str, str]: 
         """
-        Lê e retorna as configurações do ficheiro config.ini.
+        Lê e retorna as configurações do ficheiro config.ini. (Mapa)
         """
         config = configparser.ConfigParser()
         read_files = config.read(config_path)
@@ -35,7 +37,14 @@ class DataBase:
         return db
 
 
-    def connect(self, with_db=True):
+    def connect(self, with_db: bool = True) -> mysql.connector.connection.MySQLConnection:
+        """
+        Cria e retorna uma ligação MySQL ao servidor, com ou sem especificar a base de dados.
+
+        :param with_db: Se True, conecta diretamente à base de dados especificada nas configurações.
+                        Se False, conecta apenas ao servidor (usado para criar a base de dados).
+        :return: Instância de MySQLConnection estabelecida.
+        """
         db = self.config
         params = {
             'host': db['host'],
@@ -83,7 +92,9 @@ class DataBase:
         :param params: Parâmetros opcionais para o comando SQL.
         """
         self.cursor.execute(query, params or ())
-        self.connection.commit()
+        # !! nao fazer commits a selects --> bug !!
+        if not query.strip().lower().startswith("select"):
+            self.connection.commit()
 
 
     def fetchall(self):
@@ -98,11 +109,27 @@ class DataBase:
         """
         Cria as tabelas principais do sistema, se não existirem.
         """
+        # TODO :  SEPARAR POR ENTIDADE
         self.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 email VARCHAR(255) NOT NULL UNIQUE,
                 password VARCHAR(255) NOT NULL
+            )
+        ''')
+        self.execute('''
+            CREATE TABLE IF NOT EXISTS profiles (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                nome VARCHAR(255),
+                data_nascimento DATE,
+                altura_cm INT,
+                genero CHAR(1),
+                peso_inicial_kg DECIMAL(5,2),
+                peso_kg DECIMAL(5,2),
+                data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+                ultima_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
             )
         ''')
         # outras

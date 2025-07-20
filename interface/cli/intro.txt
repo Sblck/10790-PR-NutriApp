@@ -1,0 +1,1 @@
+Espaço dedicado às interface em consola ( CLI - COMMAND LINE INTERFACE)
