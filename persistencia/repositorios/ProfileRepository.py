@@ -24,8 +24,8 @@ class ProfileRepository:
             raise ValueError(f"Já existe um perfil para o utilizador com ID {profile.user_id}")
         
         query = """
-            INSERT INTO profiles (user_id, nome, data_nascimento, altura_cm, genero, peso_inicial_kg, peso_kg)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO profiles (user_id, nome, data_nascimento, altura_cm, genero, peso_inicial_kg, peso_kg, data_criacao, ultima_atualizacao)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         params = (
             profile.user_id,
@@ -34,22 +34,14 @@ class ProfileRepository:
             profile.altura_cm,
             profile.genero,
             profile.peso_inicial_kg,
-            profile.peso_kg
+            profile.peso_kg,
+            profile.data_criacao,
+            profile.ultima_atualizacao
         )
         #insert na base de dados
         self.db.execute(query, params)
         # obter id gerado automaticamente pela base de dados e atualiza o objeto em memória
         profile.id = self.db.cursor.lastrowid
-
-        # obter as datas de criação e atualização atribuídas pela base de dados
-        self.db.execute(
-            "SELECT data_criacao, ultima_atualizacao FROM profiles WHERE id = %s",
-            (profile.id,)
-        )
-        result = self.db.cursor.fetchone()
-        if result:
-            profile.data_criacao = result[0]
-            profile.ultima_atualizacao = result[1]
 
         return profile
 
@@ -65,7 +57,7 @@ class ProfileRepository:
         query = """
             UPDATE profiles 
             SET nome = %s, data_nascimento = %s, altura_cm = %s, genero = %s, 
-                peso_inicial_kg = %s, peso_kg = %s
+                peso_kg = %s, ultima_atualizacao =%s
             WHERE id = %s AND user_id = %s
         """
         params = (
@@ -73,26 +65,15 @@ class ProfileRepository:
             profile.data_nascimento,
             profile.altura_cm,
             profile.genero,
-            profile.peso_inicial_kg,
             profile.peso_kg,
+            profile.ultima_atualizacao,
             profile.id,
             profile.user_id
         )
-        
         self.db.execute(query, params)
-        
         # Verificar se alguma linha foi afetada
         if self.db.cursor.rowcount == 0:
             raise ValueError("Perfil não encontrado ou não autorizado para atualização")
-        
-        # Obter a nova data de atualização (atualizada automaticamente pela BD)
-        self.db.execute(
-            "SELECT ultima_atualizacao FROM profiles WHERE id = %s",
-            (profile.id,)
-        )
-        result = self.db.cursor.fetchone()
-        if result:
-            profile.ultima_atualizacao = result[0]
         
         return profile
 

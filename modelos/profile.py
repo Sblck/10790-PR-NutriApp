@@ -6,16 +6,16 @@ class userProfile:
     '''
     def __init__(
         self,
+        user_id, 
         nome, 
         data_nascimento, 
         altura_cm, 
         genero, 
         peso_inicial_kg, 
         peso_kg, 
+        data_criacao, 
+        ultima_atualizacao,
         id=None, 
-        user_id=None, 
-        data_criacao=None, 
-        ultima_atualizacao=None
     ):
         self.id = id
         self.user_id = user_id
@@ -33,11 +33,14 @@ class userProfile:
         Valida se os campos obrigatórios existem
         '''
         return all([
+            self.user_id is not None,
             self.nome is not None,
             self.data_nascimento is not None,
             self.altura_cm is not None,
             self.genero is not None,
             self.peso_inicial_kg is not None,
-            self.peso_kg is not None
+            self.peso_kg is not None,
+            self.data_criacao is not None,
+            self.ultima_atualizacao is not None
         ])
         

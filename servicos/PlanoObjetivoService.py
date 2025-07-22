@@ -1,3 +1,4 @@
+from modelos.planoObjetivo import PlanoObjetivo
 from persistencia.repositorios.PlanoObjetivoRepository import PlanoObjetivoRepository
 from persistencia.repositorios.ObjetivoRepository import ObjetivoRepository
 
@@ -18,4 +19,10 @@ class PlanoObjetivoService:
                 objetivo = self.objetivo_repo.get_by_id(plano_obj.objetivo_id)
                 plano_obj.nome = objetivo.nome if objetivo else None
                 return plano_obj
-        return None 
+        return None
+    
+
+    def adicionar_objetivo(self, plano_id, objetivo_id, data_inicio, data_fim=None):
+        novo_obj = PlanoObjetivo(plano_id=plano_id, objetivo_id=objetivo_id, data_inicio=data_inicio, data_fim=data_fim)
+        self.plano_objetivo_repo.save_new_planoObjetivo(novo_obj)
+        return novo_obj

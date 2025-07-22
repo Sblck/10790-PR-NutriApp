@@ -7,7 +7,7 @@ class PlanoObjetivo:
         self.plano_id = plano_id
         self.objetivo_id = objetivo_id
         self.data_inicio = data_inicio
-        self.data_fim = data_fim  
+        self.data_fim = data_fim
 
     def is_active(self, data=None):
         """

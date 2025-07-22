@@ -6,24 +6,15 @@ class PlanoRepository:
         self.db = db
 
 
-    def save_new_plano(self, plano):
+    def save_new_plano(self, plano : Plano):
         self.db.execute(
             """
-            INSERT INTO plano (user_id, nome, estado)
-            VALUES (%s, %s, %s)
+            INSERT INTO plano (user_id, nome, estado, data_inicio)
+            VALUES (%s, %s, %s, %s)
             """,
-            (plano.user_id, plano.nome, plano.estado)
+            (plano.user_id, plano.nome, plano.estado, plano.data_inicio)
         )
         plano.id = self.db.cursor.lastrowid
-        # querry as datas  atribuidas pela base de dados e atualizar o objeto em memoria
-        self.db.execute(
-            "SELECT data_inicio, data_fim FROM plano WHERE id = %s",
-            (plano.id,)
-        )
-        result = self.db.cursor.fetchone()
-        if result:
-            plano.data_inicio = result[0]
-            plano.data_fim = result[1]
 
         return plano
 

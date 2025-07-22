@@ -1,9 +1,6 @@
-# Responsabilidade: todo o processo de registo, utilizador + perfil
-# criação do utilizador e do perfil em memoria / temp
+# Responsabilidade: todo o processo de registo
 
-# TODO : PLANO incial? Objectivo incial ? 
-
-
+from datetime import date, datetime
 from gestores.ProfileManager import ProfileManager
 from gestores.UserManager import UserManager
 from persistencia.basedados.DataBase import DataBase
@@ -125,33 +122,38 @@ class RegistrationService:
             elif not (self.plano_repo and self.plano_objetivo_repo):
                 return {"success": False, "error": "Sistema de planos não disponível."}
 
-            # criar user temp e validar
+            # 'YYYY-MM-DD'
+            data_inicio = date.today().isoformat()
+            # 'YYYY-MM-DD HH:MM:SS'
+            data_inicio_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            # criar user
             user = self.user_manager.create_user(**user_data)
+            # validar user
             self.user_manager.validate_user_for_registration(user)
-            
-            # criar perfil temp e validar
-            profile = self.profile_manager.create_profile(**profile_data)
-            self.profile_manager.validate_profile_for_registration(profile)
-
-            # criar plano temp / id , user_id indefined
-            plano = Plano(nome="Plano Inicial", estado="ativo")
-            
-            # transformar user temp em user final e perfil temp em perfil final -> gravar db 
+            # graver e gerar id
             self.user_repo.save_new_user(user)
+            
+            # criar perfil
+            profile_data['data_criacao'] = data_inicio
+            profile_data['ultima_atualizacao'] = data_inicio_time
+            # atualizar user_id em perfil
+            profile_data['user_id'] = user.id
+            profile = self.profile_manager.create_profile(**profile_data)
 
-            # atualizar a chave estrangeira user_id em perfil que aponta para o utilizador válido e gravar db (atualiza datas no objeto em memoria)
-            profile.user_id = user.id
+            # validar perfil
+            self.profile_manager.validate_profile_for_registration(profile)
+            # gravar e gerar id
             self.profile_repo.save_new_profile(profile)
 
-            #atualizar user_id em plano
-            plano.user_id = user.id
-            #gravar para a db que atualiza o seu id interno e data_inicio / também poderiamos apssar a data de registo do user 
+            # criar plano 
+            plano = Plano(user_id=user.id, nome="Plano Inicial", data_inicio=data_inicio, estado="ativo")
             self.plano_repo.save_new_plano(plano)
 
-            #objetivo objeto / aqui tecnicamente também podemos passar data_inicio = plano.data_inicio mas a db já atualiza com o insert
-            plano_objetivo = PlanoObjetivo(plano_id=plano.id, objetivo_id=objetivo_id)
+            #objetivo objeto
+            plano_objetivo = PlanoObjetivo(plano_id=plano.id, objetivo_id=objetivo_id, data_inicio=data_inicio)
 
-            #gravar e obter id (atualziar datas) -> tabela sql que liga plano a um objetivo
+            #gravar e obter id -> tabela sql que liga plano a um objetivo
             self.plano_objetivo_repo.save_new_planoObjetivo(plano_objetivo)
 
             #adicionar a plano (objeto em memoria)

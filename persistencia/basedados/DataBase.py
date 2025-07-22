@@ -129,8 +129,8 @@ class DataBase:
                 genero CHAR(1),
                 peso_inicial_kg DECIMAL(5,2),
                 peso_kg DECIMAL(5,2),
-                data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-                ultima_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                data_criacao DATETIME NOT NULL,
+                ultima_atualizacao DATETIME NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )
         ''')
@@ -147,7 +147,7 @@ class DataBase:
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
                 nome VARCHAR(255) NOT NULL,
-                data_inicio DATE DEFAULT (CURRENT_DATE),
+                data_inicio DATE NOT NULL,
                 data_fim DATE DEFAULT NULL,
                 estado VARCHAR(50) NOT NULL DEFAULT 'ativo',
                 FOREIGN KEY (user_id) REFERENCES users(id)
@@ -159,7 +159,7 @@ class DataBase:
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 plano_id INT NOT NULL,
                 objetivo_id INT NOT NULL,
-                data_inicio DATE DEFAULT (CURRENT_DATE),
+                data_inicio DATE NOT NULL,
                 data_fim DATE DEFAULT NULL,
                 FOREIGN KEY (plano_id) REFERENCES plano(id),
                 FOREIGN KEY (objetivo_id) REFERENCES objetivo(id)

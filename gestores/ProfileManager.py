@@ -12,10 +12,8 @@ class ProfileManager:
         Args:
             **profile_data: Dicionário com os dados do perfil.
                            Deve conter: user_id, nome, data_nascimento, altura_cm, genero, 
-                                      peso_inicial_kg, peso_kg
-                           Opcional: data_criacao, ultima_atualizacao
-        
-        NOTA : As datas de criação e atualização são geridas pela base de dados e só devem ser preenchidas após persistência.
+                                      peso_inicial_kg, peso_kg, data_criacao, ultima_atualizacao
+                                      Opcional: id
         """
         return userProfile(**profile_data)
 
