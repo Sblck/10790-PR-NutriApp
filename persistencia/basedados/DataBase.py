@@ -92,9 +92,9 @@ class DataBase:
         :param params: Parâmetros opcionais para o comando SQL.
         """
         self.cursor.execute(query, params or ())
-        # !! nao fazer commits a selects --> bug !!
-        if not query.strip().lower().startswith("select"):
-            self.connection.commit()
+        # não dar commit automaticamente, pode criar objetos sem referencia em caso de erro
+        # commits agora devem ser controaldos nos serviços
+        # ações que envolvem mais de um tipo de objeto -> serviço, caso erro -> rollback
 
 
     def fetchall(self):
@@ -110,6 +110,7 @@ class DataBase:
         Cria as tabelas principais do sistema, se não existirem.
         """
         # TODO :  SEPARAR POR ENTIDADE
+        # users
         self.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -117,6 +118,7 @@ class DataBase:
                 password VARCHAR(255) NOT NULL
             )
         ''')
+        # profiles
         self.execute('''
             CREATE TABLE IF NOT EXISTS profiles (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -130,6 +132,37 @@ class DataBase:
                 data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
                 ultima_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        ''')
+        # objetivos
+        self.execute('''
+            CREATE TABLE IF NOT EXISTS objetivo (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nome VARCHAR(50) NOT NULL UNIQUE
+            )
+        ''')
+        # planos
+        self.execute('''
+            CREATE TABLE IF NOT EXISTS plano (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                nome VARCHAR(255) NOT NULL,
+                data_inicio DATE DEFAULT (CURRENT_DATE),
+                data_fim DATE DEFAULT NULL,
+                estado VARCHAR(50) NOT NULL DEFAULT 'ativo',
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        ''')
+        # plano_objetivo
+        self.execute('''
+            CREATE TABLE IF NOT EXISTS plano_objetivo (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                plano_id INT NOT NULL,
+                objetivo_id INT NOT NULL,
+                data_inicio DATE DEFAULT (CURRENT_DATE),
+                data_fim DATE DEFAULT NULL,
+                FOREIGN KEY (plano_id) REFERENCES plano(id),
+                FOREIGN KEY (objetivo_id) REFERENCES objetivo(id)
             )
         ''')
         # outras

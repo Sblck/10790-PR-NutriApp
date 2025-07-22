@@ -10,6 +10,7 @@ class CLILanding:
         self.auth_service = auth_service
         self.registration_service = registration_service
 
+
     def execute(self):
         while True:
             print("\n=== Autenticação ===")
@@ -78,12 +79,14 @@ class CLILanding:
             # recolher dados do perfil
             profile_data = self.__get_profile_data()
             if profile_data is None:
-                continue  # Volta a pedir credenciais
-            
-            # tentar registar
+                continue
+            objetivo_id = self.__choose_objetivo()
+            if objetivo_id is None:
+                print("Registo cancelado.")
+                return None
             user_data = credentials
             try:
-                result = self.registration_service.register_user(user_data, profile_data)
+                result = self.registration_service.register_user(user_data, profile_data, objetivo_id)
                 if result["success"]:
                     print("Registo efetuado com sucesso!")
                     return self.auth_service.login(credentials["email"], credentials["password"])
@@ -97,6 +100,7 @@ class CLILanding:
                 if not self.__ask_retry():
                     return None
                 continue
+
 
     def __get_profile_data(self):
         """
@@ -158,6 +162,23 @@ class CLILanding:
                 "peso_inicial_kg": peso_inicial_kg,
                 "peso_kg": peso_kg
             }
+        
+    
+    def __choose_objetivo(self):
+        objetivos = self.registration_service.get_objetivos_disponiveis()
+        if not objetivos:
+            print("Nenhum objetivo disponível. Contacte o administrador.")
+            return None
+        print("\n--- Escolha o seu objetivo inicial ---")
+        for idx, obj in enumerate(objetivos, 1):
+            print(f"{idx}. {obj.nome}")
+        while True:
+            escolha = input("Selecione o número do objetivo: ").strip()
+            if not escolha.isdigit() or not (1 <= int(escolha) <= len(objetivos)):
+                print("Opção inválida. Tente novamente.")
+                continue
+            return objetivos[int(escolha)-1].id
+
 
     def __ask_retry(self):
         """
